@@ -219,4 +219,4 @@ For issues with:
 
 ---
 
-Built with ⚡ by [Your Name]
+Built with ⚡ by [Aminskid]
