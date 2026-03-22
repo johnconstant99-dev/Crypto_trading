@@ -1,0 +1,84 @@
+🚀 Quick Deployment Guide - Vercel
+Prerequisites
+	∙	GitHub account
+	∙	Vercel account (free tier is fine)
+	∙	Your code ready to push
+Step-by-Step Deployment
+1️⃣ Push to GitHub
+2️⃣ Deploy on Vercel
+Option A: Vercel Dashboard (Recommended for First Time)
+	1.	Go to https://vercel.com
+	2.	Click “Sign Up” or “Login” (use GitHub account)
+	3.	Click “Add New Project”
+	4.	Click “Import Git Repository”
+	5.	Select your alpaca-crypto-trader repository
+	6.	Vercel auto-detects settings:
+	∙	Framework Preset: Vite
+	∙	Build Command: npm run build
+	∙	Output Directory: dist
+	7.	Click “Deploy”
+	8.	Wait 1-2 minutes ⏳
+	9.	Done! ✅ Your app is live!
+Your app URL will be something like:
+https://alpaca-crypto-trader.vercel.app
+Option B: Vercel CLI (For Advanced Users)
+3️⃣ Configure Your App
+	1.	Open your deployed app URL
+	2.	Go to Settings page
+	3.	Enter your Alpaca API keys:
+	∙	Paper Trading API Key
+	∙	Paper Trading Secret Key
+	∙	(Optional) Live Trading keys
+	4.	Save keys
+	5.	Start trading! 🎉
+🔄 Updating Your App
+After making changes to your code:
+Vercel will automatically deploy your updates! 🚀
+🎨 Custom Domain (Optional)
+	1.	In Vercel dashboard, go to your project
+	2.	Click “Settings” → “Domains”
+	3.	Add your custom domain (e.g., mytrader.com)
+	4.	Follow DNS configuration instructions
+	5.	Done! Your app now runs on your domain
+⚡ Performance Tips
+Your app is already optimized with:
+	∙	✅ Vite for fast builds
+	∙	✅ Code splitting
+	∙	✅ Asset optimization
+	∙	✅ CDN delivery via Vercel Edge Network
+🐛 Common Issues
+Issue: “Build Failed”
+Solution: Check build logs in Vercel dashboard. Usually a dependency issue.
+Issue: “Blank Page After Deploy”
+Solution: Check browser console. Usually a routing issue.
+	∙	Verify vercel.json is in root directory
+	∙	Clear browser cache
+Issue: API Keys Not Saving
+Solution: API keys are stored in memory only (by design for security)
+	∙	Re-enter keys each session
+	∙	Consider using environment variables for auto-fill
+🔒 Security Best Practices
+	∙	✅ Never commit API keys to GitHub
+	∙	✅ Use .gitignore (already included)
+	∙	✅ Start with Paper Trading
+	∙	✅ Enable 2FA on Vercel account
+	∙	✅ Use environment variables for sensitive data
+📊 Monitoring Your App
+Vercel provides:
+	∙	Real-time logs
+	∙	Analytics
+	∙	Performance metrics
+	∙	Error tracking
+Access these in your Vercel project dashboard.
+🎯 Next Steps
+	1.	✅ Deploy to Vercel
+	2.	✅ Configure API keys
+	3.	✅ Test with Paper Trading
+	4.	🎨 Customize branding (optional)
+	5.	🌐 Add custom domain (optional)
+	6.	📱 Share with friends!
+Need Help?
+	∙	Vercel Docs: https://vercel.com/docs
+	∙	Alpaca Docs: https://docs.alpaca.markets/
+	∙	Create GitHub issue for app-specific problems
+Happy Trading! 🚀📈
