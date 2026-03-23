@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { create } from 'zustand';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 // Zustand Store
 const useStore = create((set, get) => ({
 // API Configuration
@@ -74,16 +75,16 @@ return this.request('/v2/positions');
 async getOrders(status = 'all') {
 return this.request(`/v2/orders?status=${status}&limit=50`);
 }
-async placeOrder(symbol, qty, side, type = 'market', timeInForce = 'gtc', limitPrice const order = {
-= null
+async placeOrder(symbol, qty, side, type = 'market', timeInForce = 'gtc', limitPrice = null) {
+const order = {
 symbol,
 qty,
 side,
 type,
 time_in_force: timeInForce,
+};
 if (type === 'limit' && limitPrice) {
 order.limit_price = limitPrice;
-};
 }
 return this.request('/v2/orders', 'POST', order);
 }
@@ -152,8 +153,8 @@ const { account, positions, quotes, watchlist } = useStore();
 const totalValue = account?.portfolio_value || 0;
 const cashBalance = account?.cash || 0;
 const buyingPower = account?.buying_power || 0;
-const dayPL = account?.equity ? parseFloat(account.equity) - parseFloat(account.last_equity
-const dayPLPercent = account?.last_equity ? (dayPL / parseFloat(account.last_equity)) * 100
+const dayPL = account?.equity ? parseFloat(account.equity) - parseFloat(account.last_equity) : 0;
+const dayPLPercent = account?.last_equity ? (dayPL / parseFloat(account.last_equity)) * 100 : 0;
 return (
 <div className="page">
 <h1 className="page-title">Dashboard</h1>
@@ -208,22 +209,22 @@ const unrealizedPLPercent = parseFloat(position.unrealized_plpc) * 100;
 return (
 <div key={position.symbol} className="position-card">
 <div className="position-header">
-<span className="position-symbol">{position.symbol.replace('USD', '')}</s
-<span className="position-qty">{position.qty} {position.symbol.replace('U
+<span className="position-symbol">{position.symbol.replace('USD', '')}</span>
+<span className="position-qty">{position.qty} {position.symbol.replace('USD', '')}</span>
 </div>
 <div className="position-details">
 <div className="detail-item">
 <span className="detail-label">Avg Price:</span>
-<span className="detail-value">${parseFloat(position.avg_entry_price).t
+<span className="detail-value">${parseFloat(position.avg_entry_price).toFixed(2)}</span>
 </div>
 <div className="detail-item">
 <span className="detail-label">Current:</span>
-<span className="detail-value">${parseFloat(position.current_price).toF
+<span className="detail-value">${parseFloat(position.current_price).toFixed(2)}</span>
 </div>
 <div className="detail-item">
 <span className="detail-label">P/L:</span>
-<span className={`detail-value ${unrealizedPL >= 0 ? 'positive' : 'nega
-{unrealizedPL >= 0 ? '+' : ''}${unrealizedPL.toFixed(2)} ({unrealized
+<span className={`detail-value ${unrealizedPL >= 0 ? 'positive' : 'negative'}`}>
+{unrealizedPL >= 0 ? '+' : ''}${unrealizedPL.toFixed(2)} ({unrealizedPLPercent.toFixed(2)}%)
 </span>
 </div>
 </div>
@@ -237,7 +238,7 @@ return (
 );
 }
 function Trading() {
-const { quotes, watchlist, mode, paperApiKey, paperSecretKey, liveApiKey, liveSecretKey } =
+const { quotes, watchlist, mode, paperApiKey, paperSecretKey, liveApiKey, liveSecretKey } = useStore();
 const [selectedSymbol, setSelectedSymbol] = useState('BTCUSD');
 const [orderSide, setOrderSide] = useState('buy');
 const [orderType, setOrderType] = useState('market');
@@ -369,7 +370,7 @@ className="form-input"
 </div>
 <div className="summary-row">
 <span>Est. Total:</span>
-<span>${(parseFloat(quantity || 0) * (orderType === 'limit' ? parseFloat(limitP
+<span>${(parseFloat(quantity || 0) * (orderType === 'limit' ? parseFloat(limitPrice || 0) : currentPrice)).toFixed(2)}</span>
 </div>
 </div>
 <button
@@ -395,7 +396,7 @@ You are about to place a LIVE order with real money:
 <div><strong>Symbol:</strong> {selectedSymbol}</div>
 <div><strong>Quantity:</strong> {quantity}</div>
 <div><strong>Type:</strong> {orderType.toUpperCase()}</div>
-{orderType === 'limit' && <div><strong>Limit Price:</strong> ${limitPrice}</div
+{orderType === 'limit' && <div><strong>Limit Price:</strong> ${limitPrice}</div>}
 </div>
 <div className="modal-actions">
 <button className="btn-cancel" onClick={() => setShowConfirm(false)}>
@@ -425,7 +426,7 @@ return (
 <div className="allocation-bar">
 <div className="bar-label">
 <span>Cash</span>
-<span>${cashValue.toFixed(2)} ({((cashValue / totalValue) * 100).toFixed(1)}%)<
+<span>${cashValue.toFixed(2)} ({((cashValue / totalValue) * 100).toFixed(1)}%)</span>
 </div>
 <div className="bar-track">
 <div
@@ -476,7 +477,7 @@ return (
 <div>${parseFloat(position.current_price).toFixed(2)}</div>
 <div>${parseFloat(position.market_value).toFixed(2)}</div>
 <div className={unrealizedPL >= 0 ? 'positive' : 'negative'}>
-{unrealizedPL >= 0 ? '+' : ''}${unrealizedPL.toFixed(2)} ({unrealizedPLPerc
+{unrealizedPL >= 0 ? '+' : ''}${unrealizedPL.toFixed(2)} ({unrealizedPLPercent.toFixed(2)}%)
 </div>
 </div>
 );
@@ -504,8 +505,8 @@ setTimeout(() => setStatus(''), 3000);
 setStatus(` Error: ${error.message}`);
 }
 };
-const pendingOrders = orders.filter(o => ['new', 'partially_filled', 'pending_new'].include
-const completedOrders = orders.filter(o => !['new', 'partially_filled', 'pending_new'].incl
+const pendingOrders = orders.filter(o => ['new', 'partially_filled', 'pending_new'].includes(o.status));
+const completedOrders = orders.filter(o => !['new', 'partially_filled', 'pending_new'].includes(o.status));
 return (
 <div className="page">
 <h1 className="page-title">Orders</h1>
@@ -519,16 +520,16 @@ return (
 {pendingOrders.map(order => (
 <div key={order.id} className="order-card">
 <div className="order-header">
-<span className={`order-side ${order.side}`}>{order.side.toUpperCase()}</sp
+<span className={`order-side ${order.side}`}>{order.side.toUpperCase()}</span>
 <span className="order-symbol">{order.symbol}</span>
 <span className={`order-status ${order.status}`}>{order.status}</span>
 </div>
 <div className="order-details">
 <div><strong>Type:</strong> {order.type}</div>
 <div><strong>Qty:</strong> {order.qty}</div>
-{order.limit_price && <div><strong>Limit:</strong> ${parseFloat(order.limit
+{order.limit_price && <div><strong>Limit:</strong> ${parseFloat(order.limit_price).toFixed(2)}</div>}
 <div><strong>Filled:</strong> {order.filled_qty}/{order.qty}</div>
-<div><strong>Created:</strong> {new Date(order.created_at).toLocaleString()
+<div><strong>Created:</strong> {new Date(order.created_at).toLocaleString()}</div>
 </div>
 <button
 className="btn-cancel-order"
@@ -550,16 +551,16 @@ Cancel Order
 {completedOrders.slice(0, 20).map(order => (
 <div key={order.id} className="order-card">
 <div className="order-header">
-<span className={`order-side ${order.side}`}>{order.side.toUpperCase()}</sp
+<span className={`order-side ${order.side}`}>{order.side.toUpperCase()}</span>
 <span className="order-symbol">{order.symbol}</span>
 <span className={`order-status ${order.status}`}>{order.status}</span>
 </div>
 <div className="order-details">
 <div><strong>Type:</strong> {order.type}</div>
 <div><strong>Qty:</strong> {order.qty}</div>
-{order.filled_avg_price && <div><strong>Avg Fill:</strong> ${parseFloat(ord
+{order.filled_avg_price && <div><strong>Avg Fill:</strong> ${parseFloat(order.filled_avg_price).toFixed(2)}</div>}
 <div><strong>Filled:</strong> {order.filled_qty}/{order.qty}</div>
-<div><strong>Updated:</strong> {new Date(order.updated_at).toLocaleString()
+<div><strong>Updated:</strong> {new Date(order.updated_at).toLocaleString()}</div>
 </div>
 </div>
 ))}
@@ -849,6 +850,7 @@ return (
 <main className="main-content">
 {renderPage()}
 </main>
+<SpeedInsights />
 <style>{`
 * {
 margin: 0;
@@ -1621,8 +1623,8 @@ grid-template-columns: 1fr 1fr;
 font-size: 12px;
 }
 }
-</div>
 `}</style>
+</div>
 );
 }
 export default App;
