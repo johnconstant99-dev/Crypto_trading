@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { create } from 'zustand';
 import { SpeedInsights } from '@vercel/speed-insights/react';
+import { Analytics } from '@vercel/analytics/react';
 // Zustand Store
 const useStore = create((set, get) => ({
 // API Configuration
@@ -851,6 +852,7 @@ return (
 {renderPage()}
 </main>
 <SpeedInsights />
+<Analytics />
 <style>{`
 * {
 margin: 0;
